@@ -2,20 +2,20 @@
 
 source setenv.sh
 
-echo running at `date` >> log
+now=$(date +"%Y-%m-%d %H:%M:%S")
 
 # first we need to check who is at location
 curl -k $CHECKIN_ENDPOINT/checkins/$LOCATION > temp2.json
 
 RET=$?
 if [ "$RET" -ne 0 ]; then
-  echo error: curl returned $RET >> log
+  echo $now error: curl returned $RET >> log
   exit 1
 fi
 
 PEOPLE_PRESENT=($(jq --raw-output '. | length' temp2.json))
 
-echo people at $LOCATION $PEOPLE_PRESENT >> log
+echo $now people at $LOCATION $PEOPLE_PRESENT >> log
 
 CURRENT_STATUS=`cat status`
 OPERATION=""
@@ -40,31 +40,31 @@ echo $HOUR
 if [ "$HOUR" -gt "0100" ]; then
   if [ "$HOUR" -lt "0800" ]; then
     # we are at night, arm
-    echo we are at night, arm >> log
+    echo $now we are at night, arm >> log
     OPERATION="arm"
     MESSAGE="Night-mode. Blink armed"
-#    curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/arm
+    curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/arm
   else
     # we are at day
     if [ "$PEOPLE_PRESENT" = "0" ]; then
-       echo no one is present, arm >> log
+       echo $now no one is present, arm >> log
        OPERATION="arm"
        MESSAGE="No-one present. Blink armed"
-#        curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/arm
+        curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/arm
     else
-        echo someone is present, disarm >> log
+        echo $now someone is present, disarm >> log
         OPERATION="disarm"
         MESSAGE="Day-mode and someone is present. Blink disarmed"
-#        curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/disarm
+        curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/disarm
     fi
 
   fi
 fi
 
 if [ "$OPERATION" = "$CURRENT_STATUS" ]; then
-  echo current state is $CURRENT_STATS and target is $OPERATION. NOP >>log
+  echo $now current state is $CURRENT_STATUS and target is $OPERATION. NOP >> log
 else
-  echo current state is $CURRENT_STATS an target is $OPERATION. Applying $OPERATION >>log
+  echo $now current state is $CURRENT_STATUS an target is $OPERATION. Applying $OPERATION >> log
   curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/$OPERATION
   echo $OPERATION > status
   if [ "$NOTIFY" -eq 1 ]; then
