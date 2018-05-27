@@ -67,7 +67,7 @@ else
   echo $now current state is $CURRENT_STATUS an target is $OPERATION. Applying $OPERATION >> log
   curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/$OPERATION
   echo $OPERATION > status
-  if [ "$NOTIFY" -eq 1 ]; then
+  if [ "$NOTIFY" = "1" ]; then
   	slack.phar chat:post-message $BOT_CHANNEL "$MESSAGE" --username=$BOT_NAME --token=$BOT_TOKEN
   fi
 fi  
