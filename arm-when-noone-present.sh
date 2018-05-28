@@ -43,21 +43,17 @@ if [ "$HOUR" -gt "0100" ]; then
     echo $now we are at night, arm >> log
     OPERATION="arm"
     MESSAGE="Night-mode. Blink armed"
-    curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/arm
   else
     # we are at day
     if [ "$PEOPLE_PRESENT" = "0" ]; then
        echo $now no one is present, arm >> log
        OPERATION="arm"
        MESSAGE="No-one present. Blink armed"
-        curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/arm
     else
         echo $now someone is present, disarm >> log
         OPERATION="disarm"
         MESSAGE="Day-mode and someone is present. Blink disarmed"
-        curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/disarm
     fi
-
   fi
 fi
 
@@ -68,7 +64,8 @@ else
   curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/$OPERATION
   echo $OPERATION > status
   if [ "$NOTIFY" = "1" ]; then
-  	slack.phar chat:post-message $BOT_CHANNEL "$MESSAGE" --username=$BOT_NAME --token=$BOT_TOKEN
+	echo $now sending notification to slack: $MESSAGE >> log
+  	/home/pi/.local/bin/slack.phar chat:post-message $BOT_CHANNEL "$MESSAGE" --username=$BOT_NAME --token=$BOT_TOKEN
   fi
 fi  
     
