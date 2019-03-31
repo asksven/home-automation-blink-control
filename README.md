@@ -15,10 +15,13 @@ export BLINK_PWD=<your-blink-password>
 export BLINK_EMAIL=<your-blink-email>
 export CHECKIN_ENDPOINT=<the-endpoint-of-the-check-in-service>
 export LOCATION=<the-location-you-monitor>
-export NOTIFY=<0|1>
+export NOTIFY_SLACK=<0|1>
+export NOTIFY_MATTERMOST=<0|1>
 export BOT_NAME=<some-name>
 export BOT_CHANNEL=<some-channel>
 export BOT_TOKEN=<slack-token>
+export MM_WEBHOOK=<your-mattermost-incoming-webhook>
+
 ```
 
 To schedule the utility to run regularly (in this example every 2 minutes) edit your crontab (`crontab -e`) and add:

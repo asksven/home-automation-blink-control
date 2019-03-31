@@ -63,9 +63,13 @@ else
   echo $now current state is $CURRENT_STATUS an target is $OPERATION. Applying $OPERATION >> log
   curl -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $TOKEN" --data-binary --compressed https://rest.$REGION.immedia-semi.com/network/$NETWORK/$OPERATION
   echo $OPERATION > status
-  if [ "$NOTIFY" = "1" ]; then
+  if [ "$NOTIFY_SLACK" = "1" ]; then
 	echo $now sending notification to slack: $MESSAGE >> log
   	/home/pi/.local/bin/slack.phar chat:post-message $BOT_CHANNEL "$MESSAGE" --username=$BOT_NAME --token=$BOT_TOKEN
+  fi
+  if [ "$NOTIFY_MATTERMOST" = "1" ]; then
+    echo $now sending notification to mattermost: $MESSAGE >> log
+    curl -i -X POST -d 'payload={"text": "'"$MESSAGE"'", "username":"'"$BOT_NAME"'", "channel":"'"$BOT_CHANNEL"'"}' $MM_WEBHOOK
   fi
 fi  
     
